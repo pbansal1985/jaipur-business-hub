@@ -1,0 +1,11 @@
+namespace JaipurHub.Api.Contracts;
+public record RegisterRequest(string FullName,string Email,string Phone,string Password,string Role);
+public record LoginRequest(string Email,string Password);
+public record BusinessRequest(string Name,string Description,string BusinessType,string Gstin,string Phone,string Email,string City,string Area,string Address);
+public record ListingRequest(string Kind,string Name,string Category,string Description,decimal? PriceFrom,decimal? PriceTo,string Unit,int? MinimumOrderQuantity);
+public record LeadRequest(string Title,string Category,decimal Quantity,string Unit,string City,string Area,string Description);
+public record QuoteRequest(decimal Amount,string Terms,int ValidDays);
+public record ReviewRequest(int Rating,string Body);
+public record TokenResponse(string AccessToken,string RefreshToken,DateTime ExpiresAt);
+public record ApiError(string Code,string Message,string TraceId);
+public record BootstrapAdminRequest(string FullName,string Email,string Phone,string Password,string BootstrapSecret);

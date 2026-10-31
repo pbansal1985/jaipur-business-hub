@@ -1,0 +1,40 @@
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env}
+    ports: ["1433:1433"]
+    volumes: ["jaipur_sql:/var/opt/mssql"]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+  schema:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on: {sql: {condition: service_healthy}}
+    volumes: ["./database/schema.sql:/schema.sql:ro"]
+    entrypoint: ["sqlcmd"]
+    command: ["-S","sql","-U","sa","-P","${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env}","-C","-d","master","-i","/schema.sql"]
+  api:
+    build: {context: ., dockerfile: Dockerfile.api}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__JaipurHub: "Server=sql,1433;Database=JaipurBusinessHub;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set a 32+ byte signing key}
+      Admin__BootstrapSecret: ${ADMIN_BOOTSTRAP_SECRET:-}
+      Web__Origins__0: ${WEB_ORIGIN:-http://localhost:3000}
+    ports: ["5080:8080"]
+    depends_on:
+      schema: {condition: service_completed_successfully}
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args: {NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5080}}
+    ports: ["3000:3000"]
+    depends_on: [api]
+volumes:
+  jaipur_sql:

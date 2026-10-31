@@ -1,0 +1,27 @@
+name: Jaipur Business Hub CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: {dotnet-version: '8.0.x'}
+      - run: dotnet restore outputs/jaipur-business-hub/src/JaipurHub.Api/JaipurHub.Api.csproj
+      - run: dotnet publish outputs/jaipur-business-hub/src/JaipurHub.Api/JaipurHub.Api.csproj -c Release -o artifacts/api
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run: {working-directory: outputs/jaipur-business-hub/web}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: npm install
+      - run: npm run build

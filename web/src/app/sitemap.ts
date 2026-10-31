@@ -1,0 +1,2 @@
+import type {MetadataRoute} from "next";
+export default function sitemap():MetadataRoute.Sitemap {const origin=process.env.SITE_URL||"https://jaipurbusinesshub.in";return[{url:origin,lastModified:new Date(),changeFrequency:"daily",priority:1},{url:origin+"/#categories",lastModified:new Date(),changeFrequency:"weekly",priority:.7},{url:origin+"/#plans",lastModified:new Date(),changeFrequency:"monthly",priority:.5}]}

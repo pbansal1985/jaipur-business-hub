@@ -1,0 +1,2 @@
+import type {MetadataRoute} from "next";
+export default function robots():MetadataRoute.Robots {const origin=process.env.SITE_URL||"https://jaipurbusinesshub.in";return{rules:{userAgent:"*",allow:"/",disallow:["/admin","/dashboard"]},sitemap:origin+"/sitemap.xml"}}

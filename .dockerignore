@@ -1,0 +1,5 @@
+**/bin
+**/obj
+web/node_modules
+web/.next
+.git
